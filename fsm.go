@@ -1,25 +1,3 @@
-// Package gofsm provides a clean, deterministic finite state machine (FSM)
-// for Go with support for guards, lifecycle hooks, context propagation,
-// and structured transition definitions.
-//
-// It is designed to be composable, AI-agent-friendly, and free of global state.
-//
-// Basic usage:
-//
-//	f, err := gofsm.New(gofsm.Config{
-//	    Initial: "idle",
-//	    Transitions: []gofsm.Transition{
-//	        {From: "idle", Event: "start", To: "running"},
-//	        {From: "running", Event: "pause", To: "paused"},
-//	        {From: "paused", Event: "resume", To: "running"},
-//	        {From: "running", Event: "stop", To: "idle"},
-//	    },
-//	})
-//	if err != nil {
-//	    log.Fatal(err)
-//	}
-//
-//	err = f.Trigger(context.Background(), "start")
 package gofsm
 
 import (
@@ -74,13 +52,13 @@ const Wildcard State = "*"
 
 // FSM is a finite state machine. It is safe for concurrent use.
 type FSM struct {
-	mu          sync.RWMutex
-	current     State
-	transitions map[transitionKey]Transition
-	onEnter     map[State]HookFunc
-	onExit      map[State]HookFunc
+	mu           sync.RWMutex
+	current      State
+	transitions  map[transitionKey]Transition
+	onEnter      map[State]HookFunc
+	onExit       map[State]HookFunc
 	onTransition HookFunc
-	history     []HistoryEntry
+	history      []HistoryEntry
 }
 
 type transitionKey struct {
@@ -134,12 +112,12 @@ func New(cfg Config) (*FSM, error) {
 	}
 
 	return &FSM{
-		current:      cfg.Initial,
-		transitions:  tmap,
-		onEnter:      onEnter,
-		onExit:       onExit,
-		onTransition: cfg.OnTransition,
-		history:      []HistoryEntry{},
+		current:       cfg.Initial,
+		transitions:   tmap,
+		onEnter:       onEnter,
+		onExit:        onExit,
+		onTransition:  cfg.OnTransition,
+		history:       []HistoryEntry{},
 	}, nil
 }
 
@@ -225,9 +203,13 @@ func (f *FSM) AvailableEvents() []Event {
 	defer f.mu.RUnlock()
 
 	var events []Event
+	seen := make(map[Event]struct{})
 	for key := range f.transitions {
 		if key.from == f.current || key.from == Wildcard {
-			events = append(events, key.event)
+			if _, exists := seen[key.event]; !exists {
+				events = append(events, key.event)
+				seen[key.event] = struct{}{}
+			}
 		}
 	}
 	return events
