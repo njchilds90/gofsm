@@ -23,11 +23,9 @@ Thank you for your interest in contributing!
 ## Reporting Issues
 
 Open a GitHub Issue with a clear description, reproduction steps, and Go version.
-```
 
 ---
 
----
 ## gofsm v1.0.0
 
 First stable release of `gofsm` — a clean, deterministic finite state machine library for Go.

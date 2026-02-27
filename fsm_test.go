@@ -99,7 +99,10 @@ func TestNew_EmptyTo(t *testing.T) {
 }
 
 func TestTrigger_Valid(t *testing.T) {
-	f, _ := trafficLight()
+	f, err := trafficLight()
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
 	ctx := context.Background()
 
 	if err := f.Trigger(ctx, "go"); err != nil {
@@ -111,8 +114,11 @@ func TestTrigger_Valid(t *testing.T) {
 }
 
 func TestTrigger_InvalidEvent(t *testing.T) {
-	f, _ := trafficLight()
-	err := f.Trigger(context.Background(), "slow")
+	f, err := trafficLight()
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	err = f.Trigger(context.Background(), "slow")
 	if !errors.Is(err, gofsm.ErrInvalidEvent) {
 		t.Fatalf("expected ErrInvalidEvent, got %v", err)
 	}
@@ -162,7 +168,10 @@ func TestTrigger_GuardAllows(t *testing.T) {
 }
 
 func TestIs(t *testing.T) {
-	f, _ := trafficLight()
+	f, err := trafficLight()
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
 	if !f.Is("red") {
 		t.Fatal("expected Is(red) to be true")
 	}
@@ -172,7 +181,10 @@ func TestIs(t *testing.T) {
 }
 
 func TestCan_Cannot(t *testing.T) {
-	f, _ := trafficLight()
+	f, err := trafficLight()
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
 	if !f.Can("go") {
 		t.Fatal("expected Can(go) to be true")
 	}
@@ -182,7 +194,10 @@ func TestCan_Cannot(t *testing.T) {
 }
 
 func TestHistory(t *testing.T) {
-	f, _ := trafficLight()
+	f, err := trafficLight()
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
 	ctx := context.Background()
 	_ = f.Trigger(ctx, "go")
 	_ = f.Trigger(ctx, "slow")
@@ -200,7 +215,10 @@ func TestHistory(t *testing.T) {
 }
 
 func TestReset(t *testing.T) {
-	f, _ := trafficLight()
+	f, err := trafficLight()
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
 	f.Reset("yellow")
 	if f.Current() != "yellow" {
 		t.Fatalf("expected yellow after reset, got %s", f.Current())
@@ -208,7 +226,10 @@ func TestReset(t *testing.T) {
 }
 
 func TestAllStates(t *testing.T) {
-	f, _ := trafficLight()
+	f, err := trafficLight()
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
 	states := f.AllStates()
 	seen := make(map[string]bool)
 	for _, s := range states {
@@ -222,7 +243,10 @@ func TestAllStates(t *testing.T) {
 }
 
 func TestAvailableEvents(t *testing.T) {
-	f, _ := trafficLight()
+	f, err := trafficLight()
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
 	events := f.AvailableEvents()
 	if len(events) != 1 || events[0] != "go" {
 		t.Fatalf("expected [go], got %v", events)
@@ -295,7 +319,10 @@ func TestOnTransitionHook(t *testing.T) {
 }
 
 func TestDot(t *testing.T) {
-	f, _ := trafficLight()
+	f, err := trafficLight()
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
 	dot := f.Dot()
 	if !strings.Contains(dot, "digraph FSM") {
 		t.Fatal("Dot output missing digraph header")
